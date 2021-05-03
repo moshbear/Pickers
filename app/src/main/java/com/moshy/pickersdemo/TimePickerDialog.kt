@@ -34,7 +34,7 @@ import android.widget.TimePicker.OnTimeChangedListener
 import androidx.annotation.IdRes
 import androidx.annotation.StyleRes
 import androidx.core.view.get
-import java.util.*
+import java.util.Locale
 
 class TimePickerDialog(
     _context: Context, @StyleRes themeResId: Int,

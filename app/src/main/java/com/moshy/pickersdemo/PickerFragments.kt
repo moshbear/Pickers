@@ -22,7 +22,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.format.DateFormat
 import androidx.fragment.app.DialogFragment
-import java.util.*
+import java.util.Calendar
 
 class DatePickerFragment(
     private val activity: Activity, private val listener: DatePickerDialog.OnDateSetListener
@@ -51,8 +51,10 @@ class TimePickerFragment(
         val minute = c.get(Calendar.MINUTE)
         val second = c.get(Calendar.SECOND)
 
+        val is24Hour = DateFormat.is24HourFormat(activity)
+
         // Create a new instance of TimePickerDialog and return it
-        return TimePickerDialog(activity, listener, hour, minute, second, DateFormat.is24HourFormat(activity))
+        return TimePickerDialog(activity, listener, hour, minute, second, is24Hour)
 
     }
 

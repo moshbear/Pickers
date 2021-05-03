@@ -16,7 +16,9 @@
 package com.moshy.pickersdemo
 
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 private val sdf: SimpleDateFormat by lazy {
     // TODO: Separators are not locale-aware. Don't care until an issue gets opened.

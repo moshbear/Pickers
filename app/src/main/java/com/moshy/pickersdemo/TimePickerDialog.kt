@@ -110,6 +110,12 @@ class TimePickerDialog(
             }
         }
 
+        /* TODO: Manipulation is incomplete because we do not update minute on over/under-flow.
+         *       Nor is IME-based accessibility implemented.
+         *       As this will modify a substantial amount of the picker inputs, a custom
+         *       TimePicker itself will have to be created due to an absurd amount of effective
+         *       code duplication otherwise.
+         */
         secondsPicker = createSecondsPicker(context, initialSecond)
         with (secondsPicker) {
             layout.addView(this)

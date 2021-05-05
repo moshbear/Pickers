@@ -15,6 +15,7 @@
 */
 package com.moshy.pickersdemo
 
+import android.app.Application
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -22,19 +23,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 internal class MainViewModel(
+    private val app: Application,
     initialTimestamp: Long
 ) : ViewModel() {
 
-    class Factory(private val initialTimestamp: Long
+    class Factory(private val app: Application, private val initialTimestamp: Long
     ): ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MainViewModel(initialTimestamp) as T
+            return MainViewModel(app, initialTimestamp) as T
         }
     }
     private val currentDT = MutableLiveData<DateTimeTuple>()
-    val getDTString get() = Transformations.map(currentDT)
-    { if (it != null) timestampToDateTimeString(it.pack()) else null }
+    val dtString
+        get() = dtStringView(currentDT, app, R.string.datetime_message)
+
 
     enum class OpState {
         INACTIVE, ACTIVE,

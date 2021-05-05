@@ -32,7 +32,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val nowSecs = System.currentTimeMillis() / 1000
         binding = DataBindingUtil.setContentView<MainActivityBinding>(this, R.layout.main_activity)
-        viewModel = ViewModelProvider(this, MainViewModel.Factory(nowSecs)).get(MainViewModel::class.java)
+        viewModel =
+            ViewModelProvider(this, MainViewModel.Factory(application, nowSecs))
+            .get(MainViewModel::class.java)
 
         binding.vm = viewModel
         binding.lifecycleOwner = this

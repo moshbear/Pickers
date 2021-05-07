@@ -17,7 +17,7 @@
 package com.moshy.pickersdemo
 
 import android.app.Activity
-import android.app.DatePickerDialog
+import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -25,7 +25,7 @@ import androidx.fragment.app.DialogFragment
 import java.util.Calendar
 
 class DatePickerFragment(
-    private val activity: Activity, private val listener: DatePickerDialog.OnDateSetListener
+    private val activity: Activity, private val listener: OnDateSetListener
 ): DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

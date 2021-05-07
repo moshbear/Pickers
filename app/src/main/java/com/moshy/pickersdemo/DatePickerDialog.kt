@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2021 Andrey V
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* This is a copy paste of android.app.DatePickerDialog but using our id/datePicker
+ * instead of system android:id/datePicker
+ */
+package com.moshy.pickersdemo
+
+import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.OnClickListener
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.DatePicker
+import android.widget.DatePicker.OnDateChangedListener
+import java.util.Calendar
+
+/**
+ * A simple dialog containing an [android.widget.DatePicker].
+ *
+ *
+ * See the [Pickers]({@docRoot}guide/topics/ui/controls/pickers.html)
+ * guide.
+ */
+class DatePickerDialog(
+    context: Context,
+    theme: Int,
+    private val mCallBack: DatePickerDialog.OnDateSetListener?,
+    year: Int,
+    monthOfYear: Int,
+    dayOfMonth: Int
+) : AlertDialog(context, theme),
+    OnClickListener, OnDateChangedListener {
+    /**
+     * Gets the [DatePicker] contained in this dialog.
+     *
+     * @return The calendar view.
+     */
+    private val datePicker: DatePicker =
+        LayoutInflater.from(context).inflate(R.layout.date_picker_dialog, null)
+        .also { setView(it) }
+        .findViewById<DatePicker>(R.id.datePicker)
+        .also {
+            try {
+                @Suppress("DEPRECATION")
+                it.calendarViewShown = false
+            } catch (_: UnsupportedOperationException) {
+                check(false) { "The style is calendar not spinner" }
+            }
+            it.init(year, monthOfYear, dayOfMonth, this)
+        }
+
+    private val mCalendar: Calendar = Calendar.getInstance()
+    private var mTitleNeedsUpdate = true
+
+    /**
+     * @param context The context the dialog is to run in.
+     * @param callBack How the parent is notified that the date is set.
+     * @param year The initial year of the dialog.
+     * @param monthOfYear The initial month of the dialog.
+     * @param dayOfMonth The initial day of the dialog.
+     */
+    constructor(
+        context: Context,
+        callBack: DatePickerDialog.OnDateSetListener?,
+        year: Int,
+        monthOfYear: Int,
+        dayOfMonth: Int
+    ) : this(context, 0, callBack, year, monthOfYear, dayOfMonth)
+
+    private companion object {
+        const val YEAR = "year"
+        const val MONTH = "month"
+        const val DAY = "day"
+    }
+
+    /**
+     * @param context The context the dialog is to run in.
+     * @param theme the theme to apply to this dialog
+     * @param callBack How the parent is notified that the date is set.
+     * @param year The initial year of the dialog.
+     * @param monthOfYear The initial month of the dialog.
+     * @param dayOfMonth The initial day of the dialog.
+     */
+    init {
+        setTitle(R.string.date_picker_dialog_title)
+        setButton(BUTTON_POSITIVE, context.getText(R.string.date_time_done), this)
+    }
+
+    override fun onClick(dialog: DialogInterface, which: Int) {
+        tryNotifyDateSet()
+    }
+
+    override fun onDateChanged(
+        view: DatePicker, year: Int,
+        month: Int, day: Int
+    ) {
+        datePicker.init(year, month, day, this)
+    }
+
+    /**
+     * Sets the current date.
+     *
+     * @param year The date year.
+     * @param monthOfYear The date month.
+     * @param dayOfMonth The date day of month.
+     */
+    fun updateDate(year: Int, monthOfYear: Int, dayOfMonth: Int) {
+        datePicker.updateDate(year, monthOfYear, dayOfMonth)
+    }
+
+    private fun tryNotifyDateSet() {
+        if (mCallBack != null) {
+            datePicker.clearFocus()
+            mCallBack.onDateSet(
+                datePicker, datePicker.year,
+                datePicker.month, datePicker.dayOfMonth
+            )
+        }
+    }
+
+    override fun onStop() {
+        tryNotifyDateSet()
+        super.onStop()
+    }
+
+    override fun onSaveInstanceState(): Bundle {
+        val state: Bundle = super.onSaveInstanceState()
+        state.putInt(YEAR, datePicker.year)
+        state.putInt(MONTH, datePicker.month)
+        state.putInt(DAY, datePicker.dayOfMonth)
+        return state
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val year = savedInstanceState.getInt(YEAR)
+        val month = savedInstanceState.getInt(MONTH)
+        val day = savedInstanceState.getInt(DAY)
+        datePicker.init(year, month, day, this)
+    }
+
+}

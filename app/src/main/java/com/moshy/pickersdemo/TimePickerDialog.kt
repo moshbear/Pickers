@@ -71,7 +71,7 @@ class TimePickerDialog(
 
     init {
         setTitle(R.string.time_picker_dialog_title)
-        setButton(BUTTON_POSITIVE, context.getString(R.string.time_picker_done), this)
+        setButton(BUTTON_POSITIVE, context.getString(R.string.date_time_done), this)
 
         timePicker =
             LayoutInflater.from(context).inflate(R.layout.time_picker_dialog, null)

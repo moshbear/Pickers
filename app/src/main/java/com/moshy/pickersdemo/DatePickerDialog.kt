@@ -67,9 +67,6 @@ class DatePickerDialog(
             it.init(year, monthOfYear, dayOfMonth, this)
         }
 
-    private val mCalendar: Calendar = Calendar.getInstance()
-    private var mTitleNeedsUpdate = true
-
     /**
      * @param context The context the dialog is to run in.
      * @param callBack How the parent is notified that the date is set.

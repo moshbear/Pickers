@@ -16,17 +16,25 @@
 */
 package com.moshy.pickersdemo
 
-import android.app.Activity
-import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
 import android.os.Bundle
 import android.text.format.DateFormat
 import androidx.fragment.app.DialogFragment
 import java.util.Calendar
 
-class DatePickerFragment(
-    private val activity: Activity, private val listener: OnDateSetListener
-): DialogFragment() {
+class DatePickerFragment(): DialogFragment() {
+
+    companion object {
+        private const val bundleListener = "listener"
+
+        @JvmStatic
+        fun newInstance(listener: DatePickerDialog.OnDateSetListener): DatePickerFragment =
+            DatePickerFragment().apply {
+                this.arguments = Bundle().apply {
+                    putParcelable(bundleListener, listener)
+                }
+            }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker
@@ -35,14 +43,25 @@ class DatePickerFragment(
         val month = c.get(Calendar.MONTH)
         val day = c.get(Calendar.DAY_OF_MONTH)
 
+        val listener = checkNotNull(arguments).getParcelable<DatePickerDialog.OnDateSetListener>(bundleListener)
         // Create a new instance of DatePickerDialog and return it
-        return DatePickerDialog(activity, listener, year, month, day)
+        return DatePickerDialog(requireActivity(), listener, year, month, day)
     }
 }
 
 class TimePickerFragment(
-    private val activity: Activity, private val listener: TimePickerDialog.OnTimeSetListener
 ): DialogFragment() {
+
+    companion object {
+        private const val bundleListener = "listener"
+        @JvmStatic
+        fun newInstance(listener: TimePickerDialog.OnTimeSetListener): TimePickerFragment =
+            TimePickerFragment().apply {
+                this.arguments = Bundle().apply {
+                    putParcelable(bundleListener, listener)
+                }
+            }
+        }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default values for the picker
@@ -51,10 +70,11 @@ class TimePickerFragment(
         val minute = c.get(Calendar.MINUTE)
         val second = c.get(Calendar.SECOND)
 
-        val is24Hour = DateFormat.is24HourFormat(activity)
+        val is24Hour = DateFormat.is24HourFormat(requireActivity())
 
+        val listener = checkNotNull(arguments).getParcelable<TimePickerDialog.OnTimeSetListener>(bundleListener)
         // Create a new instance of TimePickerDialog and return it
-        return TimePickerDialog(activity, listener, hour, minute, second, is24Hour)
+        return TimePickerDialog(requireActivity(), listener, hour, minute, second, is24Hour)
 
     }
 

@@ -23,6 +23,8 @@ import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.content.res.Resources
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -42,8 +44,10 @@ class TimePickerDialog(
     initialHourOfDay: Int, initialMinute: Int, initialSecond: Int, is24HourView: Boolean
 ): AlertDialog(_context, themeResId), OnClickListener, OnTimeChangedListener {
 
-    fun interface OnTimeSetListener {
+    fun interface OnTimeSetListener: Parcelable {
         fun onTimeSet(view: TimePicker, hour: Int, minute: Int, second: Int)
+        override fun describeContents(): Int = 0
+        override fun writeToParcel(dest: Parcel, flags: Int) { /* no-op */ }
     }
 
     constructor(

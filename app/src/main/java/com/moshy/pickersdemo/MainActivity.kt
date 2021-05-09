@@ -47,13 +47,13 @@ class MainActivity : AppCompatActivity() {
     {
         pickerWidget.datetimeLayout.visibility = View.GONE
         pickerWidget.pickDate.setOnClickListener {
-            DatePickerFragment(this)
-            { _, y, m, d -> viewModel.setDateFromPickerResult(y, m, d) }
+            DatePickerFragment.newInstance { _, y, m, d ->
+                viewModel.setDateFromPickerResult(y, m, d) }
             .show(supportFragmentManager, "datePicker/0")
         }
         pickerWidget.pickTime.setOnClickListener {
-            TimePickerFragment(this)
-            { _, h, m, s -> viewModel.setTimeFromPickerResult(h, m, s) }
+            TimePickerFragment.newInstance { _, h, m, s
+                -> viewModel.setTimeFromPickerResult(h, m, s) }
             .show(supportFragmentManager, "timePicker/0")
         }
     }

@@ -21,11 +21,12 @@
 package com.moshy.pickersdemo
 
 import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.widget.DatePicker
 import android.widget.DatePicker.OnDateChangedListener
@@ -41,7 +42,7 @@ import java.util.Calendar
 class DatePickerDialog(
     context: Context,
     theme: Int,
-    private val mCallBack: DatePickerDialog.OnDateSetListener?,
+    private val mCallBack: OnDateSetListener?,
     year: Int,
     monthOfYear: Int,
     dayOfMonth: Int
@@ -78,7 +79,7 @@ class DatePickerDialog(
      */
     constructor(
         context: Context,
-        callBack: DatePickerDialog.OnDateSetListener?,
+        callBack: OnDateSetListener?,
         year: Int,
         monthOfYear: Int,
         dayOfMonth: Int
@@ -90,14 +91,12 @@ class DatePickerDialog(
         const val DAY = "day"
     }
 
-    /**
-     * @param context The context the dialog is to run in.
-     * @param theme the theme to apply to this dialog
-     * @param callBack How the parent is notified that the date is set.
-     * @param year The initial year of the dialog.
-     * @param monthOfYear The initial month of the dialog.
-     * @param dayOfMonth The initial day of the dialog.
-     */
+    fun interface OnDateSetListener: Parcelable {
+        fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int)
+        override fun describeContents(): Int = 0
+        override fun writeToParcel(dest: Parcel, flags: Int) { /* no-op */ }
+    }
+
     init {
         setTitle(R.string.date_picker_dialog_title)
         setButton(BUTTON_POSITIVE, context.getText(R.string.date_time_done), this)

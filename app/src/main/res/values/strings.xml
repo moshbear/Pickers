@@ -25,4 +25,23 @@
     <string name="time_picker_dialog_title">Set time</string>
     <string name="date_time_done">Done</string>
 
+
+    <!-- TimePicker - accessibility support -->
+    <!-- Description of the button to increase the TimePicker's second value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_increment_second_button">Increase second</string>
+    <!-- Description of the button to decrease the TimePicker's second value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_decrement_second_button">Decrease second</string>
+    <!-- Description of the button to increase the TimePicker's minute value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_increment_minute_button">Increase minute</string>
+    <!-- Description of the button to decrease the TimePicker's minute value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_decrement_minute_button">Decrease minute</string>
+    <!-- Description of the button to increase the TimePicker's hour value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_increment_hour_button">Increase hour</string>
+    <!-- Description of the button to decrease the TimePicker's hour value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_decrement_hour_button">Decrease hour</string>
+    <!-- Description of the button to increase the TimePicker's set PM value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_increment_set_pm_button">Set PM</string>
+    <!-- Description of the button to decrease the TimePicker's set AM value. [CHAR LIMIT=NONE] -->
+    <string name="time_picker_decrement_set_am_button">Set AM</string>
+
 </resources>

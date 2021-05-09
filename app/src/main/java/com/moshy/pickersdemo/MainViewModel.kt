@@ -16,12 +16,14 @@
 package com.moshy.pickersdemo
 
 import android.app.Application
+import android.text.format.DateFormat
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import java.util.Calendar
 
 internal class MainViewModel(
     private val app: Application,
@@ -29,7 +31,8 @@ internal class MainViewModel(
     is24HourView: Boolean = DateFormat.is24HourFormat(app)
 ) : ViewModel() {
 
-    class Factory(private val app: Application, private val initialTimestamp: Long
+    class Factory(
+        private val app: Application, private val initialTimestamp: Long
     ): ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -37,8 +40,8 @@ internal class MainViewModel(
         }
     }
 
-    private val _currentDT = MutableLiveData<DateTimeTuple>()
-    val currentDT: LiveData<DateTimeTuple>
+    private val _currentDT = MutableLiveData<Calendar>()
+    val currentDT: LiveData<Calendar>
         get() = _currentDT
     @Suppress("DEPRECATION")
     private val locale = app.resources.configuration.locale

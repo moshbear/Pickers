@@ -30,13 +30,13 @@ class DatePickerFragment(): DialogFragment() {
 
         @JvmStatic
         internal fun newInstance(
-            initDate: DateTriple? = null,
+            initDate: Calendar = Calendar.getInstance(),
             listener: DatePickerDialog.OnDateSetListener
         ): DatePickerFragment =
             DatePickerFragment().apply {
                 this.arguments = Bundle().apply {
                     putParcelable(bundleListener, listener)
-                    putParcelable(bundleInitDate, initDate ?: defaultDateTriple())
+                    putLong(bundleInitDate, initDate.timeInMillis)
                 }
             }
     }
@@ -46,10 +46,13 @@ class DatePickerFragment(): DialogFragment() {
 
         val args = checkNotNull(arguments)
         val listener = checkNotNull(args.getParcelable<DatePickerDialog.OnDateSetListener>(bundleListener))
-        val initDate = checkNotNull(args.getParcelable<DateTriple>(bundleInitDate))
+        val initTsMillis = checkNotNull(args.getLong(bundleInitDate))
+
+        val c = Calendar.getInstance().apply { this.timeInMillis = initTsMillis }
 
         // Create a new instance of DatePickerDialog and return it
-        return DatePickerDialog(requireActivity(), listener, initDate.year, initDate.month, initDate.day)
+        return DatePickerDialog(requireActivity(), listener,
+            c[Calendar.YEAR], c[Calendar.MONTH], c[Calendar.DAY_OF_MONTH])
     }
 }
 
@@ -59,16 +62,20 @@ class TimePickerFragment(
     companion object {
         private const val bundleListener = "listener"
         private const val bundleInitTime = "initTime"
+        private const val bundleIs24Hour = "is24Hour"
 
         @JvmStatic
         internal fun newInstance(
-            initTime: TimeTriple? = null,
+            initTime: Calendar = Calendar.getInstance(),
+            is24Hour: Boolean? = null,
             listener: TimePickerDialog.OnTimeSetListener
         ): TimePickerFragment =
             TimePickerFragment().apply {
                 this.arguments = Bundle().apply {
                     putParcelable(bundleListener, listener)
-                    putParcelable(bundleInitTime, initTime ?: defaultTimeTriple())
+                    putLong(bundleInitTime, initTime.timeInMillis)
+                    if (is24Hour != null)
+                        putBoolean(bundleIs24Hour, is24Hour)
                 }
             }
         }
@@ -78,12 +85,15 @@ class TimePickerFragment(
 
         val args = checkNotNull(arguments)
         val listener = checkNotNull(args.getParcelable<TimePickerDialog.OnTimeSetListener>(bundleListener))
-        val initTime = checkNotNull(args.getParcelable<TimeTriple>(bundleInitTime))
+        val initTsMillis = checkNotNull(args.getLong(bundleInitTime))
 
-        val is24Hour = DateFormat.is24HourFormat(requireActivity())
+        val is24Hour = (args.get(bundleIs24Hour) as Boolean?) ?: DateFormat.is24HourFormat(requireActivity())
+
+        val c = Calendar.getInstance().apply { this.timeInMillis = initTsMillis }
 
         // Create a new instance of TimePickerDialog and return it
-        return TimePickerDialog(requireActivity(), listener, initTime.hour, initTime.minute, initTime.second, is24Hour)
+        return TimePickerDialog(requireActivity(), listener,
+            c[Calendar.HOUR_OF_DAY], c[Calendar.MINUTE], c[Calendar.SECOND], is24Hour)
 
     }
 

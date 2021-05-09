@@ -22,14 +22,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.moshy.pickersdemo.databinding.DatetimeWidgetBinding
 import com.moshy.pickersdemo.databinding.MainActivityBinding
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: MainActivityBinding
     private lateinit var viewModel: MainViewModel
 
-    private lateinit var currentDate: DateTriple
-    private lateinit var currentTime: TimeTriple
+    private lateinit var currentDT: Calendar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +43,8 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.trigger.setOnClickListener { viewModel.onClickButton() }
 
-        fun updateCurrentDT(dt: DateTimeTuple) {
-            currentDate = dt.extractDate()
-            currentTime = dt.extractTime()
+        fun updateCurrentDT(dt: Calendar) {
+            currentDT = dt
         }
 
         updateCurrentDT(checkNotNull(viewModel.currentDT.value))
@@ -61,12 +60,12 @@ class MainActivity : AppCompatActivity() {
     {
         pickerWidget.datetimeLayout.visibility = View.GONE
         pickerWidget.pickDate.setOnClickListener {
-            DatePickerFragment.newInstance(currentDate)
+            DatePickerFragment.newInstance(currentDT)
             { _, y, m, d -> viewModel.setDateFromPickerResult(y, m, d) }
             .show(supportFragmentManager, "datePicker/0")
         }
         pickerWidget.pickTime.setOnClickListener {
-            TimePickerFragment.newInstance(currentTime)
+            TimePickerFragment.newInstance(currentDT)
             { _, h, m, s  -> viewModel.setTimeFromPickerResult(h, m, s) }
             .show(supportFragmentManager, "timePicker/0")
         }

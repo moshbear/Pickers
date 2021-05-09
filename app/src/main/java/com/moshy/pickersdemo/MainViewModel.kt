@@ -17,6 +17,7 @@ package com.moshy.pickersdemo
 
 import android.app.Application
 import android.view.View
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -34,31 +35,32 @@ internal class MainViewModel(
             return MainViewModel(app, initialTimestamp) as T
         }
     }
-    private val currentDT = MutableLiveData<DateTimeTuple>()
-    val dtString
-        get() = dtStringView(currentDT, app, R.string.datetime_message)
 
+    private val _currentDT = MutableLiveData<DateTimeTuple>()
+    val currentDT: LiveData<DateTimeTuple>
+        get() = _currentDT
+    val dtString = dtStringView(currentDT, app, R.string.datetime_message)
 
     enum class OpState {
         INACTIVE, ACTIVE,
         ;
     }
     private val state = MutableLiveData<OpState>()
-    val pickerVisibility get() = Transformations.map(state) {
-        when (state.value) {
-            OpState.ACTIVE -> View.VISIBLE
-            else -> View.GONE
+    val pickerVisibility = Transformations.map(state) {
+            when (it) {
+                OpState.ACTIVE -> View.VISIBLE
+                else -> View.GONE
+            }
         }
-    }
-    val detailsVisibility get() = Transformations.map(state) {
-        when (state.value) {
-            OpState.INACTIVE -> View.VISIBLE
-            else -> View.GONE
+    val detailsVisibility = Transformations.map(state) {
+            when (it) {
+                OpState.INACTIVE -> View.VISIBLE
+                else -> View.GONE
+            }
         }
-    }
 
     init {
-        currentDT.value = DateTimeTuple.unpack(initialTimestamp)
+        _currentDT.value = DateTimeTuple.unpack(initialTimestamp)
         state.value = OpState.INACTIVE
     }
 
@@ -77,13 +79,13 @@ internal class MainViewModel(
 
     private fun setFromPickerResult(dt: WhichOf, v0: Int, v1: Int, v2: Int)
     {
-        currentDT.value?.run {
+        _currentDT.value?.run {
             val copyOther =
                 when (dt) {
                     WhichOf.DATE -> this::copyTime
                     WhichOf.TIME -> this::copyDate
                 }
-            currentDT.value = copyOther(v0, v1, v2)
+            _currentDT.value = copyOther(v0, v1, v2)
         } ?: check(false)
     }
 

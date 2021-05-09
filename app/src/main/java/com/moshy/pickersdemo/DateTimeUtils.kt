@@ -15,10 +15,12 @@
 */
 package com.moshy.pickersdemo
 
+import android.os.Parcelable
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlinx.parcelize.Parcelize
 
 private val sdf: SimpleDateFormat by lazy {
     // TODO: Separators are not locale-aware. Don't care until an issue gets opened.
@@ -27,6 +29,23 @@ private val sdf: SimpleDateFormat by lazy {
 }
 
 internal fun timestampToDateTimeString(time: Long): String = sdf.format(Date(time * 1000))
+
+
+@Parcelize
+data class DateTriple(val year: Int, val month: Int, val day: Int) : Parcelable
+internal fun defaultDateTriple(): DateTriple =
+    with (Calendar.getInstance()) {
+        DateTriple(get(Calendar.YEAR), get(Calendar.MONTH), get(Calendar.DAY_OF_MONTH))
+
+    }
+
+@Parcelize
+data class TimeTriple(val hour: Int, val minute: Int, val second: Int) : Parcelable
+internal fun defaultTimeTriple(): TimeTriple =
+    with (Calendar.getInstance()) {
+        TimeTriple(get(Calendar.HOUR_OF_DAY), get(Calendar.MINUTE), get(Calendar.SECOND))
+    }
+
 
 internal data class DateTimeTuple(
     val dY: Int = -1, val dM: Int = -1, val dD: Int = -1, // date params
@@ -50,6 +69,9 @@ internal data class DateTimeTuple(
     fun copyDate(tH_: Int, tM_: Int, tS_: Int) = DateTimeTuple(dY, dM, dD, tH_, tM_, tS_)
     /// Copy with new date and existing time.
     fun copyTime(dY_: Int, dM_: Int, dD_: Int) = DateTimeTuple(dY_, dM_, dD_, tH, tM, tS)
+
+    fun extractDate(): DateTriple = DateTriple(dY, dM, dD)
+    fun extractTime(): TimeTriple = TimeTriple(tH, tM, tS)
 
     companion object {
         fun unpack(t: Long?): DateTimeTuple? {

@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: MainActivityBinding
     private lateinit var viewModel: MainViewModel
 
+    private lateinit var currentDate: DateTriple
+    private lateinit var currentTime: TimeTriple
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val nowSecs = System.currentTimeMillis() / 1000
@@ -40,6 +43,17 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.trigger.setOnClickListener { viewModel.onClickButton() }
 
+        fun updateCurrentDT(dt: DateTimeTuple) {
+            currentDate = dt.extractDate()
+            currentTime = dt.extractTime()
+        }
+
+        updateCurrentDT(checkNotNull(viewModel.currentDT.value))
+
+        viewModel.currentDT.observe(this) {
+            updateCurrentDT(it)
+        }
+
         initPickers(binding.picker)
     }
 
@@ -47,13 +61,13 @@ class MainActivity : AppCompatActivity() {
     {
         pickerWidget.datetimeLayout.visibility = View.GONE
         pickerWidget.pickDate.setOnClickListener {
-            DatePickerFragment.newInstance { _, y, m, d ->
-                viewModel.setDateFromPickerResult(y, m, d) }
+            DatePickerFragment.newInstance(currentDate)
+            { _, y, m, d -> viewModel.setDateFromPickerResult(y, m, d) }
             .show(supportFragmentManager, "datePicker/0")
         }
         pickerWidget.pickTime.setOnClickListener {
-            TimePickerFragment.newInstance { _, h, m, s
-                -> viewModel.setTimeFromPickerResult(h, m, s) }
+            TimePickerFragment.newInstance(currentTime)
+            { _, h, m, s  -> viewModel.setTimeFromPickerResult(h, m, s) }
             .show(supportFragmentManager, "timePicker/0")
         }
     }

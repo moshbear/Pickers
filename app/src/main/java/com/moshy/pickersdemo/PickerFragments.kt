@@ -26,26 +26,30 @@ class DatePickerFragment(): DialogFragment() {
 
     companion object {
         private const val bundleListener = "listener"
+        private const val bundleInitDate = "initDate"
 
         @JvmStatic
-        fun newInstance(listener: DatePickerDialog.OnDateSetListener): DatePickerFragment =
+        internal fun newInstance(
+            initDate: DateTriple? = null,
+            listener: DatePickerDialog.OnDateSetListener
+        ): DatePickerFragment =
             DatePickerFragment().apply {
                 this.arguments = Bundle().apply {
                     putParcelable(bundleListener, listener)
+                    putParcelable(bundleInitDate, initDate ?: defaultDateTriple())
                 }
             }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker
-        val c = Calendar.getInstance()
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
 
-        val listener = checkNotNull(arguments).getParcelable<DatePickerDialog.OnDateSetListener>(bundleListener)
+        val args = checkNotNull(arguments)
+        val listener = checkNotNull(args.getParcelable<DatePickerDialog.OnDateSetListener>(bundleListener))
+        val initDate = checkNotNull(args.getParcelable<DateTriple>(bundleInitDate))
+
         // Create a new instance of DatePickerDialog and return it
-        return DatePickerDialog(requireActivity(), listener, year, month, day)
+        return DatePickerDialog(requireActivity(), listener, initDate.year, initDate.month, initDate.day)
     }
 }
 
@@ -54,27 +58,32 @@ class TimePickerFragment(
 
     companion object {
         private const val bundleListener = "listener"
+        private const val bundleInitTime = "initTime"
+
         @JvmStatic
-        fun newInstance(listener: TimePickerDialog.OnTimeSetListener): TimePickerFragment =
+        internal fun newInstance(
+            initTime: TimeTriple? = null,
+            listener: TimePickerDialog.OnTimeSetListener
+        ): TimePickerFragment =
             TimePickerFragment().apply {
                 this.arguments = Bundle().apply {
                     putParcelable(bundleListener, listener)
+                    putParcelable(bundleInitTime, initTime ?: defaultTimeTriple())
                 }
             }
         }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default values for the picker
-        val c = Calendar.getInstance()
-        val hour = c.get(Calendar.HOUR_OF_DAY)
-        val minute = c.get(Calendar.MINUTE)
-        val second = c.get(Calendar.SECOND)
+
+        val args = checkNotNull(arguments)
+        val listener = checkNotNull(args.getParcelable<TimePickerDialog.OnTimeSetListener>(bundleListener))
+        val initTime = checkNotNull(args.getParcelable<TimeTriple>(bundleInitTime))
 
         val is24Hour = DateFormat.is24HourFormat(requireActivity())
 
-        val listener = checkNotNull(arguments).getParcelable<TimePickerDialog.OnTimeSetListener>(bundleListener)
         // Create a new instance of TimePickerDialog and return it
-        return TimePickerDialog(requireActivity(), listener, hour, minute, second, is24Hour)
+        return TimePickerDialog(requireActivity(), listener, initTime.hour, initTime.minute, initTime.second, is24Hour)
 
     }
 

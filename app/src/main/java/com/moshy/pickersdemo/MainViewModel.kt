@@ -25,7 +25,8 @@ import androidx.lifecycle.ViewModelProvider
 
 internal class MainViewModel(
     private val app: Application,
-    initialTimestamp: Long
+    initialTimestamp: Long,
+    is24HourView: Boolean = DateFormat.is24HourFormat(app)
 ) : ViewModel() {
 
     class Factory(private val app: Application, private val initialTimestamp: Long
@@ -39,7 +40,11 @@ internal class MainViewModel(
     private val _currentDT = MutableLiveData<DateTimeTuple>()
     val currentDT: LiveData<DateTimeTuple>
         get() = _currentDT
-    val dtString = dtStringView(currentDT, app, R.string.datetime_message)
+    @Suppress("DEPRECATION")
+    private val locale = app.resources.configuration.locale
+    val dtString =
+        dtStringView(currentDT, DateFormatConfiguration(locale, is24HourView),
+            app, R.string.datetime_message)
 
     enum class OpState {
         INACTIVE, ACTIVE,
@@ -60,7 +65,7 @@ internal class MainViewModel(
         }
 
     init {
-        _currentDT.value = DateTimeTuple.unpack(initialTimestamp)
+        _currentDT.value = timestampToCalendar(initialTimestamp)
         state.value = OpState.INACTIVE
     }
 
@@ -72,25 +77,24 @@ internal class MainViewModel(
         }
     }
 
-    enum class WhichOf {
-        DATE, TIME,
-        ;
-    }
-
-    private fun setFromPickerResult(dt: WhichOf, v0: Int, v1: Int, v2: Int)
-    {
+    fun setDateFromPickerResult(y: Int, m: Int, d: Int) {
         _currentDT.value?.run {
-            val copyOther =
-                when (dt) {
-                    WhichOf.DATE -> this::copyTime
-                    WhichOf.TIME -> this::copyDate
-                }
-            _currentDT.value = copyOther(v0, v1, v2)
+            val c = this.clone() as Calendar // force copy
+            c[Calendar.YEAR] = y
+            c[Calendar.MONTH] = m
+            c[Calendar.DAY_OF_MONTH] = d
+            _currentDT.value = c
         } ?: check(false)
     }
 
-    fun setDateFromPickerResult(y: Int, m: Int, d: Int) = setFromPickerResult(WhichOf.DATE, y, m, d)
-
-    fun setTimeFromPickerResult(h: Int, m: Int, s: Int) = setFromPickerResult(WhichOf.TIME, h, m, s)
+    fun setTimeFromPickerResult(h: Int, m: Int, s: Int) {
+        _currentDT.value?.run {
+            val c = this.clone() as Calendar // force copy
+            c[Calendar.HOUR_OF_DAY] = h
+            c[Calendar.MINUTE] = m
+            c[Calendar.SECOND] = s
+            _currentDT.value = c
+        } ?: check(false)
+    }
 
 }

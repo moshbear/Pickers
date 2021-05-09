@@ -24,7 +24,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.Creator
 import android.text.format.DateFormat
-import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -42,6 +41,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import java.text.DateFormatSymbols
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 /**
@@ -109,6 +109,7 @@ class TimePicker(
                 false -> bestDateTimePattern12
             }
 
+    private var timeFormatter: SimpleDateFormat = SimpleDateFormat(bestDateTimePattern, locale)
     /**
      * The callback interface used to indicate the time has been adjusted.
      */
@@ -265,6 +266,7 @@ class TimePicker(
         setCurrentHour(currentHour, false)
         updateSecondControl()
         updateAmPmControl()
+        timeFormatter = SimpleDateFormat(bestDateTimePattern, locale)
     }
 
     var minute: Int
@@ -359,17 +361,12 @@ class TimePicker(
         super.onPopulateAccessibilityEvent(event)
 
         @Suppress("DEPRECATION")
-        val flags = DateUtils.FORMAT_SHOW_TIME or
-                (if (is24HourView) DateUtils.FORMAT_24HOUR
-                else DateUtils.FORMAT_12HOUR)
 
         tempCalendar.set(Calendar.HOUR_OF_DAY, hour)
         tempCalendar.set(Calendar.MINUTE, minute)
         tempCalendar.set(Calendar.SECOND, second)
-        val selectedDateUtterance = DateUtils.formatDateTime(
-            context,
-            tempCalendar.timeInMillis, flags
-        )
+
+        val selectedDateUtterance = timeFormatter.format(tempCalendar)
         event.text.add(selectedDateUtterance)
     }
 

@@ -26,17 +26,18 @@ import androidx.lifecycle.ViewModelProvider
 import java.util.Calendar
 
 internal class MainViewModel(
-    private val app: Application,
+    app: Application,
     initialTimestamp: Long,
-    is24HourView: Boolean = DateFormat.is24HourFormat(app)
+    is24HourView: Boolean
 ) : ViewModel() {
 
     class Factory(
-        private val app: Application, private val initialTimestamp: Long
+        private val app: Application, private val initialTimestamp: Long,
+        private val is24Hour: Boolean = DateFormat.is24HourFormat(app)
     ): ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MainViewModel(app, initialTimestamp) as T
+            return MainViewModel(app, initialTimestamp, is24Hour) as T
         }
     }
 

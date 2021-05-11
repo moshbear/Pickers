@@ -50,7 +50,6 @@ class TimePickerDialog(
         private const val bkMinute = "minute"
         private const val bkSecond = "second"
         private const val bkIs24Hour = "is24hour"
-        private const val missingSecond = -1
     }
 
     private val timePicker: TimePicker
@@ -120,7 +119,7 @@ class TimePickerDialog(
         super.onRestoreInstanceState(savedInstanceState)
         val hour = savedInstanceState.getInt(bkHour)
         val minute = savedInstanceState.getInt(bkMinute)
-        val second = savedInstanceState.getInt(bkSecond, missingSecond)
+        val second = savedInstanceState.getInt(bkSecond)
         timePicker.is24HourView = savedInstanceState.getBoolean(bkIs24Hour)
         timePicker.hour = hour
         timePicker.minute = minute

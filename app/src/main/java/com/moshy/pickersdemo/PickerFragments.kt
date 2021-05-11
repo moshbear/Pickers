@@ -25,8 +25,8 @@ import java.util.Calendar
 class DatePickerFragment(): DialogFragment() {
 
     companion object {
-        private const val bundleListener = "listener"
-        private const val bundleInitDate = "initDate"
+        private const val bkListener = "listener"
+        private const val bkInitDate = "initDate"
 
         @JvmStatic
         internal fun newInstance(
@@ -35,8 +35,8 @@ class DatePickerFragment(): DialogFragment() {
         ): DatePickerFragment =
             DatePickerFragment().apply {
                 this.arguments = Bundle().apply {
-                    putParcelable(bundleListener, listener)
-                    putLong(bundleInitDate, initDate.timeInMillis)
+                    putParcelable(bkListener, listener)
+                    putLong(bkInitDate, initDate.timeInMillis)
                 }
             }
     }
@@ -45,8 +45,8 @@ class DatePickerFragment(): DialogFragment() {
         // Use the current date as the default date in the picker
 
         val args = checkNotNull(arguments)
-        val listener = checkNotNull(args.getParcelable<DatePickerDialog.OnDateSetListener>(bundleListener))
-        val initTsMillis = checkNotNull(args.getLong(bundleInitDate))
+        val listener = checkNotNull(args.getParcelable<DatePickerDialog.OnDateSetListener>(bkListener))
+        val initTsMillis = checkNotNull(args.getLong(bkInitDate))
 
         val c = Calendar.getInstance().apply { this.timeInMillis = initTsMillis }
 
@@ -60,9 +60,9 @@ class TimePickerFragment(
 ): DialogFragment() {
 
     companion object {
-        private const val bundleListener = "listener"
-        private const val bundleInitTime = "initTime"
-        private const val bundleIs24Hour = "is24Hour"
+        private const val bkListener = "listener"
+        private const val bkInitTime = "initTime"
+        private const val bkIs24Hour = "is24Hour"
 
         @JvmStatic
         internal fun newInstance(
@@ -72,10 +72,10 @@ class TimePickerFragment(
         ): TimePickerFragment =
             TimePickerFragment().apply {
                 this.arguments = Bundle().apply {
-                    putParcelable(bundleListener, listener)
-                    putLong(bundleInitTime, initTime.timeInMillis)
+                    putParcelable(bkListener, listener)
+                    putLong(bkInitTime, initTime.timeInMillis)
                     if (is24Hour != null)
-                        putBoolean(bundleIs24Hour, is24Hour)
+                        putBoolean(bkIs24Hour, is24Hour)
                 }
             }
         }
@@ -84,10 +84,10 @@ class TimePickerFragment(
         // Use the current time as the default values for the picker
 
         val args = checkNotNull(arguments)
-        val listener = checkNotNull(args.getParcelable<TimePickerDialog.OnTimeSetListener>(bundleListener))
-        val initTsMillis = checkNotNull(args.getLong(bundleInitTime))
+        val listener = checkNotNull(args.getParcelable<TimePickerDialog.OnTimeSetListener>(bkListener))
+        val initTsMillis = checkNotNull(args.getLong(bkInitTime))
 
-        val is24Hour = (args.get(bundleIs24Hour) as Boolean?) ?: DateFormat.is24HourFormat(requireActivity())
+        val is24Hour = (args.get(bkIs24Hour) as Boolean?) ?: DateFormat.is24HourFormat(requireActivity())
 
         val c = Calendar.getInstance().apply { this.timeInMillis = initTsMillis }
 

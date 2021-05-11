@@ -45,14 +45,12 @@ class TimePickerDialog(
     )
     : this(context, 0, callback, hourOfDay, minute, second, is24HourView)
 
-    private companion object {
-
-        const val bundleHour = "hour"
-        const val bundleMinute = "minute"
-        const val bundleSecond = "second"
-        const val bundleIs24Hour = "is24hour"
-        const val missingSecond = -1
-
+    companion object {
+        private const val bkHour = "hour"
+        private const val bkMinute = "minute"
+        private const val bkSecond = "second"
+        private const val bkIs24Hour = "is24hour"
+        private const val missingSecond = -1
     }
 
     private val timePicker: TimePicker
@@ -111,19 +109,19 @@ class TimePickerDialog(
 
     override fun onSaveInstanceState(): Bundle {
         val state = super.onSaveInstanceState()
-        state.putInt(bundleHour, timePicker.hour)
-        state.putInt(bundleMinute, timePicker.minute)
-        state.putInt(bundleSecond, timePicker.second)
-        state.putBoolean(bundleIs24Hour, timePicker.is24HourView)
+        state.putInt(bkHour, timePicker.hour)
+        state.putInt(bkMinute, timePicker.minute)
+        state.putInt(bkSecond, timePicker.second)
+        state.putBoolean(bkIs24Hour, timePicker.is24HourView)
         return state
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val hour = savedInstanceState.getInt(bundleHour)
-        val minute = savedInstanceState.getInt(bundleMinute)
-        val second = savedInstanceState.getInt(bundleSecond, missingSecond)
-        timePicker.is24HourView = savedInstanceState.getBoolean(bundleIs24Hour)
+        val hour = savedInstanceState.getInt(bkHour)
+        val minute = savedInstanceState.getInt(bkMinute)
+        val second = savedInstanceState.getInt(bkSecond, missingSecond)
+        timePicker.is24HourView = savedInstanceState.getBoolean(bkIs24Hour)
         timePicker.hour = hour
         timePicker.minute = minute
         timePicker.second = second

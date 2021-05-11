@@ -30,7 +30,6 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.widget.DatePicker
 import android.widget.DatePicker.OnDateChangedListener
-import java.util.Calendar
 
 /**
  * A simple dialog containing an [android.widget.DatePicker].
@@ -82,10 +81,10 @@ class DatePickerDialog(
         dayOfMonth: Int
     ) : this(context, 0, callBack, year, monthOfYear, dayOfMonth)
 
-    private companion object {
-        const val YEAR = "year"
-        const val MONTH = "month"
-        const val DAY = "day"
+    companion object {
+        private const val bkYear = "year"
+        private const val bkMonth = "month"
+        private const val bkDay = "day"
     }
 
     fun interface OnDateSetListener: Parcelable {
@@ -138,17 +137,17 @@ class DatePickerDialog(
 
     override fun onSaveInstanceState(): Bundle {
         val state: Bundle = super.onSaveInstanceState()
-        state.putInt(YEAR, datePicker.year)
-        state.putInt(MONTH, datePicker.month)
-        state.putInt(DAY, datePicker.dayOfMonth)
+        state.putInt(bkYear, datePicker.year)
+        state.putInt(bkMonth, datePicker.month)
+        state.putInt(bkDay, datePicker.dayOfMonth)
         return state
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val year = savedInstanceState.getInt(YEAR)
-        val month = savedInstanceState.getInt(MONTH)
-        val day = savedInstanceState.getInt(DAY)
+        val year = savedInstanceState.getInt(bkYear)
+        val month = savedInstanceState.getInt(bkMonth)
+        val day = savedInstanceState.getInt(bkDay)
         datePicker.init(year, month, day, this)
     }
 

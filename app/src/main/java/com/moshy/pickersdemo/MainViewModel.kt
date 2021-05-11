@@ -80,24 +80,9 @@ internal class MainViewModel(
         }
     }
 
-    fun setDateFromPickerResult(y: Int, m: Int, d: Int) {
-        _currentDT.value?.run {
-            val c = this.clone() as Calendar // force copy
-            c[Calendar.YEAR] = y
-            c[Calendar.MONTH] = m
-            c[Calendar.DAY_OF_MONTH] = d
-            _currentDT.value = c
-        } ?: check(false)
-    }
 
-    fun setTimeFromPickerResult(h: Int, m: Int, s: Int) {
-        _currentDT.value?.run {
-            val c = this.clone() as Calendar // force copy
-            c[Calendar.HOUR_OF_DAY] = h
-            c[Calendar.MINUTE] = m
-            c[Calendar.SECOND] = s
-            _currentDT.value = c
-        } ?: check(false)
-    }
+    fun setDateFromPickerResult(y: Int, m: Int, d: Int) = updateDtDate(_currentDT, y, m, d)
+
+    fun setTimeFromPickerResult(h: Int, m: Int, s: Int) = updateDtTime(_currentDT, h, m, s)
 
 }

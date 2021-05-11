@@ -16,7 +16,7 @@
  */
 
 // This is adapted from android.widget.TimePicker to add seconds.
-package com.moshy.pickersdemo
+package com.moshy.pickers
 
 import android.content.Context
 import android.content.res.Resources
@@ -120,7 +120,7 @@ class TimePicker(
          * @param minute The current minute.
          * @param second The current second.
          */
-        fun onTimeChanged(view: com.moshy.pickersdemo.TimePicker?, hourOfDay: Int, minute: Int, second: Int)
+        fun onTimeChanged(view: com.moshy.pickers.TimePicker?, hourOfDay: Int, minute: Int, second: Int)
     }
 
     constructor(context: Context) : this(context, null)

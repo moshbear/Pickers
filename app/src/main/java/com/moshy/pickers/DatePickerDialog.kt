@@ -18,7 +18,7 @@
 /* This is a copy paste of android.app.DatePickerDialog but using our id/datePicker
  * instead of system android:id/datePicker
  */
-package com.moshy.pickersdemo
+package com.moshy.pickers
 
 import android.app.AlertDialog
 import android.content.Context

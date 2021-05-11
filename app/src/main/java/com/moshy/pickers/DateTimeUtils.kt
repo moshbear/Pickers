@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.moshy.pickersdemo
+package com.moshy.pickers
 
 import java.util.Calendar
 

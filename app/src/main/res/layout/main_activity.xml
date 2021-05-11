@@ -20,7 +20,7 @@
 
     <data>
         <variable name="vm"
-            type="com.moshy.pickersdemo.MainViewModel" />
+            type="com.moshy.pickers.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

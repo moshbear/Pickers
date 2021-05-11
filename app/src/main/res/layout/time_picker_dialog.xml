@@ -19,7 +19,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal">
-<com.moshy.pickersdemo.TimePicker
+<com.moshy.pickers.TimePicker
     android:id="@+id/timePicker"
     android:layout_gravity="center_horizontal"
     android:layout_width="wrap_content"

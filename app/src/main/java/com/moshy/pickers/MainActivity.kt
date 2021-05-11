@@ -13,15 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.moshy.pickersdemo
+package com.moshy.pickers
 
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.moshy.pickersdemo.databinding.DatetimeWidgetBinding
-import com.moshy.pickersdemo.databinding.MainActivityBinding
+import com.moshy.pickers.databinding.DatetimeWidgetBinding
+import com.moshy.pickers.databinding.MainActivityBinding
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {

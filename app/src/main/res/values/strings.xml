@@ -18,7 +18,7 @@
 */
 -->
 <resources>
-    <string name="app_name">PickerDemo</string>
+    <string name="app_name">Pickers</string>
     <string name="datetime_label">DateTime: </string>
     <string name="datetime_message">%1$s</string>
     <string name="date_picker_dialog_title">Set date</string>

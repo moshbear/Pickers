@@ -31,7 +31,7 @@ class TimePickerDialog(
     _context: Context, @StyleRes themeResId: Int,
     private val callback: OnTimeSetListener?,
     initialHourOfDay: Int, initialMinute: Int, initialSecond: Int, is24HourView: Boolean
-): AlertDialog(_context, themeResId), OnClickListener, TimePicker.OnTimeChangedListener {
+): AlertDialog(_context, themeResId), OnClickListener {
 
     fun interface OnTimeSetListener: Parcelable {
         fun onTimeSet(view: TimePicker, hour: Int, minute: Int, second: Int)
@@ -66,7 +66,6 @@ class TimePickerDialog(
         timePicker.hour = initialHourOfDay
         timePicker.minute = initialMinute
         timePicker.second = initialSecond
-        timePicker.setOnTimeChangedListener(this)
     }
 
     private fun tryCallback() {
@@ -82,10 +81,6 @@ class TimePickerDialog(
             "$which is unexpected because the listener was only declared for BUTTON_POSITIVE"
         }
         tryCallback()
-    }
-
-    override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int, second: Int) {
-        /* no-op */
     }
 
     /**

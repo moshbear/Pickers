@@ -19,7 +19,6 @@
 package com.moshy.pickers
 
 import android.content.Context
-import android.content.res.Resources
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.Creator
@@ -200,7 +199,7 @@ class TimePicker(
     /**
      * Set the callback that indicates the time has been adjusted by the user.
      *
-     * @param onTimeChangedListener the callback, should not be null.
+     * @param onTimeChangedListener the callback
      */
     fun setOnTimeChangedListener(onTimeChangedListener: OnTimeChangedListener?) {
         this.onTimeChangedListener = onTimeChangedListener
@@ -496,13 +495,6 @@ class TimePicker(
 
         val twoDigitFormatter = NumberPicker.Formatter { String.format("%02d", it) }
 
-
-        /**
-         * A no-op callback used in the constructor to avoid null checks later in
-         * the code.
-         */
-        val NO_OP_CHANGE_LISTENER: OnTimeChangedListener =
-            OnTimeChangedListener { _, _, _, _ -> }
     }
 
     init {
@@ -649,7 +641,6 @@ class TimePicker(
         updateHourControl()
         updateSecondControl()
         updateAmPmControl()
-        setOnTimeChangedListener(NO_OP_CHANGE_LISTENER)
         // set to current time
         hour = tempCalendar.get(Calendar.HOUR_OF_DAY)
         minute = tempCalendar.get(Calendar.MINUTE)

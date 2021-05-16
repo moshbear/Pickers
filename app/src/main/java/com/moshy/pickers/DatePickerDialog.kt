@@ -90,6 +90,7 @@ class DatePickerDialog(
 
     fun interface OnDateSetListener: Parcelable {
         fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int)
+
         override fun describeContents(): Int = 0
         override fun writeToParcel(dest: Parcel, flags: Int) { /* no-op */ }
     }
@@ -103,10 +104,7 @@ class DatePickerDialog(
         tryNotifyDateSet()
     }
 
-    override fun onDateChanged(
-        view: DatePicker, year: Int,
-        month: Int, day: Int
-    ) {
+    override fun onDateChanged(view: DatePicker, year: Int, month: Int, day: Int) {
         datePicker.init(year, month, day, this)
     }
 

@@ -86,6 +86,7 @@ class TimePicker(
 
     // callbacks
     private var onTimeChangedListener: OnTimeChangedListener? = null
+    private var dayChangeCallback: DayChangeCallback? = null
 
     @Suppress("DEPRECATION")
     private val locale = context.resources.configuration.locale
@@ -120,6 +121,20 @@ class TimePicker(
          * @param second The current second.
          */
         fun onTimeChanged(view: com.moshy.pickers.TimePicker?, hourOfDay: Int, minute: Int, second: Int)
+    }
+
+    /**
+     * The callback interface used to change the day. This is so the hour picker
+     * can move the day forward or backward when used in a combined date-time picker.
+     */
+    fun interface DayChangeCallback: Parcelable {
+        /**
+         * @param direction The direction to change the day (+1 or -1)
+         */
+        fun changeDay(direction: Int)
+
+        override fun describeContents(): Int = 0
+        override fun writeToParcel(dest: Parcel, flags: Int) { /* no-op */ }
     }
 
     constructor(context: Context) : this(context, null)
@@ -203,6 +218,15 @@ class TimePicker(
      */
     fun setOnTimeChangedListener(onTimeChangedListener: OnTimeChangedListener?) {
         this.onTimeChangedListener = onTimeChangedListener
+    }
+    /**
+     * Set the callback that updates the calendar day.
+     * Useful for combined date-time pickers.
+     *
+     * @param dayChangeCallback the callback
+     */
+    fun setDayChangeCallback(dayChangeCallback: DayChangeCallback) {
+        this.dayChangeCallback = dayChangeCallback
     }
 
     var hour: Int
@@ -426,6 +450,45 @@ class TimePicker(
         sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED)
         onTimeChangedListener?.onTimeChanged(this, hour, minute, second)
     }
+    private fun changeDay(oldHour: Int, newHour: Int) {
+        val (firstHour, lastHour) = when (is24HourView) {
+            /* This is not as elegant as
+             * when (hourFormatData.format) {
+             *     'k' ->
+             *     'H' ->
+             *     'K' ->
+             *     'h' ->
+             *     else -> throw
+             * }
+             * but it copies the decision tree of updateHourControl()
+             * so blame can be shifted there.
+             */
+            true -> when (hourFormatData.format) {
+                    'k' -> Pair(24, 23)
+                    else -> Pair(0, 23)
+                }
+            false -> when (hourFormatData.format) {
+                'K' -> Pair(0, 11)
+                else -> Pair(12, 11)
+            }
+        }
+
+        val changeDayDirection = when {
+            // rollover to minValue (AM)
+            oldHour == lastHour &&
+            newHour == firstHour &&
+            (is24HourView || isAm)
+                -> 1
+            // rollover to maxValue (PM)
+            oldHour == firstHour &&
+            newHour == lastHour &&
+            (is24HourView || !isAm)
+                -> -1
+            else -> 0
+        }
+        if (changeDayDirection != 0)
+            dayChangeCallback?.changeDay(changeDayDirection)
+    }
 
     private fun setContentDescriptions() {
         @IdRes val idIncrement = requireAndroidResource("id", "increment")
@@ -513,6 +576,7 @@ class TimePicker(
                         updateAmPmControl()
                     }
                 }
+                changeDay(oldVal, newVal)
                 onTimeChanged()
             }
             hourSpinnerInput = getEditText().also {
@@ -538,6 +602,7 @@ class TimePicker(
                     isAm = !isAm
                     updateAmPmControl()
                 }
+                changeDay(oldHour, newHour)
                 hourSpinner.value = newHour
             // XX:00 -> (XX-1):59
             } else if (oldVal == minValue && newVal == maxValue) {

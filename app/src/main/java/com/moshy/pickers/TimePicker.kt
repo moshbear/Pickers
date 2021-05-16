@@ -610,7 +610,16 @@ class TimePicker(
             setOnValueChangedListener { picker, _, _ ->
                 updateInputState()
                 picker.requestFocus()
-                isAm = !isAm
+                // https://code.google.com/p/android/issues/detail?id=18982
+                when (picker.value) {
+                    0 ->
+                        if (hour >= 12)
+                            hour -= 12
+                    1 ->
+                        if (hour < 12)
+                            hour += 12
+                }
+                // `isAm = !isAm` is handled inside setHour
                 updateAmPmControl()
                 onTimeChanged()
             }

@@ -82,7 +82,7 @@ class TimePicker(
     private val dividerHM: TextView
     private val dividerMS: TextView
 
-    private var isEnabled = DEFAULT_ENABLED_STATE
+    private var isEnabled = true
 
     // callbacks
     private var onTimeChangedListener: OnTimeChangedListener? = null
@@ -646,7 +646,7 @@ class TimePicker(
         minute = tempCalendar.get(Calendar.MINUTE)
         second = tempCalendar.get(Calendar.SECOND)
         if (!isEnabled) {
-            isEnabled = false
+            setEnabled(false)
         }
         // set the content descriptions
         setContentDescriptions()

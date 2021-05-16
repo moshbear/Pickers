@@ -30,6 +30,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.widget.DatePicker
 import android.widget.DatePicker.OnDateChangedListener
+import androidx.annotation.StyleRes
 
 /**
  * A simple dialog containing an [android.widget.DatePicker].
@@ -40,8 +41,8 @@ import android.widget.DatePicker.OnDateChangedListener
  */
 class DatePickerDialog(
     context: Context,
-    theme: Int,
-    private val mCallBack: OnDateSetListener?,
+    @StyleRes theme: Int,
+    private val callBack: OnDateSetListener?,
     year: Int,
     monthOfYear: Int,
     dayOfMonth: Int
@@ -121,9 +122,9 @@ class DatePickerDialog(
     }
 
     private fun tryNotifyDateSet() {
-        if (mCallBack != null) {
+        if (callBack != null) {
             datePicker.clearFocus()
-            mCallBack.onDateSet(
+            callBack.onDateSet(
                 datePicker, datePicker.year,
                 datePicker.month, datePicker.dayOfMonth
             )

@@ -124,7 +124,7 @@ class TimePicker(
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?)
-    : this(context, attrs, attrRefTimePickerStyle)
+    : this(context, attrs, android.R.attr.timePickerStyle)
 
     override fun setEnabled(enabled: Boolean) {
         if (isEnabled == enabled) {
@@ -657,24 +657,7 @@ class TimePicker(
     }
 }
 
-private val systemResources by lazy { requireNotNull(Resources.getSystem()) }
-
-private fun getAndroidResourceByString(type: String, name: String): Int? =
-    (systemResources.getIdentifier(name, type, "android"))
-        .run { if (this <= 0) null else this }
-
-private fun requireAndroidResource(type: String, name: String): Int =
-    requireNotNull(getAndroidResourceByString(type, name))
-    { "Could not find resource id for android:$type/$name" }
-
 /* @IdRes */ private val idRefNumberPickerInput by lazy {
     requireAndroidResource("id", "numberpicker_input")
 }
-
-/* @AttrRes */ private val attrRefTimePickerStyle by lazy {
-    requireAndroidResource("attr", "timePickerStyle")
-}
-
-private fun <T: View> View.requireViewById1(@IdRes id: Int): T =
-    requireNotNull(findViewById(id))
 private fun NumberPicker.getEditText(): EditText = requireViewById1(idRefNumberPickerInput)

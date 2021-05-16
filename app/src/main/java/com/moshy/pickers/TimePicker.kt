@@ -210,8 +210,8 @@ class TimePicker(
             val currentHour = hourSpinner.value
             return when {
                 is24HourView -> currentHour
-                isAm -> currentHour % HOURS_IN_HALF_DAY
-                else -> currentHour % HOURS_IN_HALF_DAY + HOURS_IN_HALF_DAY
+                isAm -> currentHour % hoursInHalfDay
+                else -> currentHour % hoursInHalfDay + hoursInHalfDay
             }
         }
         set(currentHour) {
@@ -225,15 +225,15 @@ class TimePicker(
         }
         if (!is24HourView) {
             // convert [0,23] ordinal to wall clock display
-            if (currentHour >= HOURS_IN_HALF_DAY) {
+            if (currentHour >= hoursInHalfDay) {
                 isAm = false
-                if (currentHour > HOURS_IN_HALF_DAY) {
-                    currentHour -= HOURS_IN_HALF_DAY
+                if (currentHour > hoursInHalfDay) {
+                    currentHour -= hoursInHalfDay
                 }
             } else {
                 isAm = true
                 if (currentHour == 0) {
-                    currentHour = HOURS_IN_HALF_DAY
+                    currentHour = hoursInHalfDay
                 }
             }
             updateAmPmControl()
@@ -361,9 +361,9 @@ class TimePicker(
 
         @Suppress("DEPRECATION")
 
-        tempCalendar.set(Calendar.HOUR_OF_DAY, hour)
-        tempCalendar.set(Calendar.MINUTE, minute)
-        tempCalendar.set(Calendar.SECOND, second)
+        tempCalendar[Calendar.HOUR_OF_DAY] = hour
+        tempCalendar[Calendar.MINUTE] = minute
+        tempCalendar[Calendar.SECOND] = second
 
         val selectedDateUtterance = timeFormatter.format(tempCalendar)
         event.text.add(selectedDateUtterance)
@@ -418,7 +418,6 @@ class TimePicker(
             val index: Int = if (isAm) Calendar.AM else Calendar.PM
             amPmSpinner.value = index
             amPmSpinner.visibility = VISIBLE
-
         }
         sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED)
     }
@@ -489,11 +488,10 @@ class TimePicker(
         }
     }
 
-    private companion object {
-        const val DEFAULT_ENABLED_STATE = true
-        const val HOURS_IN_HALF_DAY = 12
+    companion object {
+        private const val hoursInHalfDay = 12
 
-        val twoDigitFormatter = NumberPicker.Formatter { String.format("%02d", it) }
+        private val twoDigitFormatter = NumberPicker.Formatter { String.format("%02d", it) }
 
     }
 
@@ -508,8 +506,8 @@ class TimePicker(
             setOnValueChangedListener { _, oldVal, newVal ->
                 updateInputState()
                 if (!is24HourView) {
-                    if (oldVal == HOURS_IN_HALF_DAY - 1 && newVal == HOURS_IN_HALF_DAY
-                        || oldVal == HOURS_IN_HALF_DAY && newVal == HOURS_IN_HALF_DAY - 1
+                    if (oldVal == hoursInHalfDay - 1 && newVal == hoursInHalfDay
+                        || oldVal == hoursInHalfDay && newVal == hoursInHalfDay - 1
                     ) {
                         isAm = !isAm
                         updateAmPmControl()
@@ -528,23 +526,27 @@ class TimePicker(
 
         minuteSpinner = requireViewById1(R.id.minute)
         // We will have to re-use hour wrap-around handling for the seconds case of
-        // XX:59:59 -> (XX+1):0:0 or vice versa so move into separate function.
+        // XX:59:59 <-> (XX+1):0:0 so move into separate function.
         fun updateMinutesSpinnerKernel(oldVal: Int, newVal: Int) {
             val minValue = minuteSpinner.minValue
             val maxValue = minuteSpinner.maxValue
+            val oldHour = hourSpinner.value
+            // XX:59 -> (XX+1):00
             if (oldVal == maxValue && newVal == minValue) {
-                val newHour = hourSpinner.value + 1
-                if (!is24HourView && newHour == HOURS_IN_HALF_DAY) {
+                val newHour = oldHour + 1
+                if (!is24HourView && newHour == hoursInHalfDay) {
                     isAm = !isAm
                     updateAmPmControl()
                 }
                 hourSpinner.value = newHour
+            // XX:00 -> (XX-1):59
             } else if (oldVal == minValue && newVal == maxValue) {
-                val newHour = hourSpinner.value - 1
-                if (!is24HourView && newHour == HOURS_IN_HALF_DAY - 1) {
+                val newHour = oldHour - 1
+                if (!is24HourView && newHour == hoursInHalfDay - 1) {
                     isAm = !isAm
                     updateAmPmControl()
                 }
+                changeDay(oldHour, newHour)
                 hourSpinner.value = newHour
             }
         }
@@ -642,9 +644,10 @@ class TimePicker(
         updateSecondControl()
         updateAmPmControl()
         // set to current time
-        hour = tempCalendar.get(Calendar.HOUR_OF_DAY)
-        minute = tempCalendar.get(Calendar.MINUTE)
-        second = tempCalendar.get(Calendar.SECOND)
+        hour = tempCalendar[Calendar.HOUR_OF_DAY]
+        minute = tempCalendar[Calendar.MINUTE]
+        second = tempCalendar[Calendar.SECOND]
+
         if (!isEnabled) {
             setEnabled(false)
         }

@@ -164,13 +164,15 @@ class TimePicker(
         val minute: Int
         val second: Int
 
-        constructor(superState: Parcelable?, hour: Int, minute: Int, second: Int) : super(superState) {
+        constructor(superState: Parcelable?, hour: Int, minute: Int, second: Int)
+        : super(superState) {
             this.hour = hour
             this.minute = minute
             this.second = second
         }
 
-        private constructor(`in`: Parcel) : super(`in`) {
+        private constructor(`in`: Parcel)
+        : super(`in`) {
             hour = `in`.readInt()
             minute = `in`.readInt()
             second = `in`.readInt()

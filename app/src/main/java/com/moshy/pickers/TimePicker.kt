@@ -40,8 +40,8 @@ import androidx.annotation.AttrRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import java.text.DateFormatSymbols
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 /**
  * A view for selecting the time of day, in either 24 hour or AM/PM mode. The
@@ -90,7 +90,6 @@ class TimePicker(
 
     @Suppress("DEPRECATION")
     private val locale = context.resources.configuration.locale
-    private val tempCalendar = Calendar.getInstance(locale)
 
     private data class HourFormatData(val format: Char, val twoDigit: Boolean)
     private val defaultHourFormatData = HourFormatData('\u0000', false)
@@ -109,7 +108,7 @@ class TimePicker(
                 false -> bestDateTimePattern12
             }
 
-    private var timeFormatter: SimpleDateFormat = SimpleDateFormat(bestDateTimePattern, locale)
+    private var timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(bestDateTimePattern, locale)
     /**
      * The callback interface used to indicate the time has been adjusted.
      */
@@ -291,7 +290,7 @@ class TimePicker(
         setCurrentHour(currentHour, false)
         updateSecondControl()
         updateAmPmControl()
-        timeFormatter = SimpleDateFormat(bestDateTimePattern, locale)
+        timeFormatter = DateTimeFormatter.ofPattern(bestDateTimePattern, locale)
     }
 
     var minute: Int
@@ -385,13 +384,9 @@ class TimePicker(
     override fun onPopulateAccessibilityEvent(event: AccessibilityEvent) {
         super.onPopulateAccessibilityEvent(event)
 
-        @Suppress("DEPRECATION")
+        val time = LocalTime.of(hour, minute, second)
 
-        tempCalendar[Calendar.HOUR_OF_DAY] = hour
-        tempCalendar[Calendar.MINUTE] = minute
-        tempCalendar[Calendar.SECOND] = second
-
-        val selectedDateUtterance = timeFormatter.format(tempCalendar)
+        val selectedDateUtterance = time.format(timeFormatter)
         event.text.add(selectedDateUtterance)
     }
 
@@ -441,7 +436,7 @@ class TimePicker(
         if (is24HourView) {
             amPmSpinner.visibility = GONE
         } else {
-            val index: Int = if (isAm) Calendar.AM else Calendar.PM
+            val index = if (isAm) iAM else iPM
             amPmSpinner.value = index
             amPmSpinner.visibility = VISIBLE
         }
@@ -555,6 +550,8 @@ class TimePicker(
 
     companion object {
         private const val hoursInHalfDay = 12
+        private const val iAM = 0
+        private const val iPM = 1
 
         private val twoDigitFormatter = NumberPicker.Formatter { String.format("%02d", it) }
 
@@ -673,10 +670,10 @@ class TimePicker(
                 picker.requestFocus()
                 // https://code.google.com/p/android/issues/detail?id=18982
                 when (picker.value) {
-                    0 ->
+                    iAM ->
                         if (hour >= 12)
                             hour -= 12
-                    1 ->
+                    iPM ->
                         if (hour < 12)
                             hour += 12
                 }
@@ -711,9 +708,10 @@ class TimePicker(
         updateSecondControl()
         updateAmPmControl()
         // set to current time
-        hour = tempCalendar[Calendar.HOUR_OF_DAY]
-        minute = tempCalendar[Calendar.MINUTE]
-        second = tempCalendar[Calendar.SECOND]
+        val time = LocalTime.now()
+        hour = time.hour
+        minute = time.minute
+        second = time.second
 
         if (!isEnabled) {
             setEnabled(false)

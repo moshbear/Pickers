@@ -13,11 +13,21 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.moshy.pickers
+package com.moshy.pickers.ui
 
-import java.util.Calendar
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
-internal fun timestampToCalendar(ts: Long): Calendar =
-    Calendar.getInstance().apply {
-        timeInMillis = ts * 1000
+private fun getSystemZoneOffset() =
+    Instant.now().run {
+        val systemZone = ZoneId.systemDefault()
+        systemZone.rules.getOffset(this)
     }
+
+
+internal fun timestampToLocalDT(ts: Long): LocalDateTime =
+    LocalDateTime.ofEpochSecond(ts, 0, getSystemZoneOffset())
+
+internal fun localDtToTimestamp(ldt: LocalDateTime): Long =
+    ldt.toEpochSecond(getSystemZoneOffset())

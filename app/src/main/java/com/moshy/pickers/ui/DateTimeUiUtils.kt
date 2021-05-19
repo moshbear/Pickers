@@ -13,15 +13,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.moshy.pickers
+package com.moshy.pickers.ui
 
 import android.content.Context
 import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -33,9 +36,9 @@ private val DateFormatSettings = object {
 
     private lateinit var bestDateTimePattern: String
 
-    private lateinit var formatter: SimpleDateFormat
+    private lateinit var formatter: DateTimeFormatter
 
-    fun getSimpleDateFormatter(df: DateFormatConfiguration): SimpleDateFormat {
+    fun getSimpleDateFormatter(df: DateFormatConfiguration): DateTimeFormatter {
         if ((!::dateFormat.isInitialized)
             || (dateFormat != df))
         {
@@ -47,37 +50,47 @@ private val DateFormatSettings = object {
                     false -> "y-M-d\nhms"
                 })
 
-            formatter = SimpleDateFormat(bestDateTimePattern, dateFormat.locale)
+            formatter = DateTimeFormatter.ofPattern(bestDateTimePattern, dateFormat.locale)
         }
         return formatter
     }
 }
 
-internal fun timestampToDateTimeString(df: DateFormatConfiguration, time: Long): String =
+internal fun timestampToDateTimeString(df: DateFormatConfiguration, dt: LocalDateTime): String =
+    // the formatter is thread-safe; the caching by the singleton is not
     synchronized(DateFormatSettings) {
-        DateFormatSettings.getSimpleDateFormatter(df).format(Date(time * 1000))
+        dt.format(DateFormatSettings.getSimpleDateFormatter(df))
     }
 
-internal fun dtStringView(dt: LiveData<Calendar>, df: DateFormatConfiguration,
-                          context: Context, @StringRes resId: Int) =
-    Transformations.map(dt) {
-        context.getString(resId, timestampToDateTimeString(df, it.timeInMillis / 1000))
+internal fun dtStringView24(dt: LiveData<LocalDateTime>, is24hour: LiveData<Boolean>, locale: Locale,
+                          context: Context, @StringRes resId: Int): LiveData<String> =
+    MediatorLiveData<String>().apply {
+        val stringView = { dt: LocalDateTime, is24: Boolean ->
+            context.getString(resId,
+                timestampToDateTimeString(
+                    DateFormatConfiguration(locale, is24),
+                    dt)
+            )
+        }
+
+        addSource(dt) { dt: LocalDateTime? ->
+            is24hour.value?.run {
+                this@apply.value = stringView(checkNotNull(dt), this)
+            }
+        }
+        addSource(is24hour) { is24h: Boolean? ->
+            dt.value?.run {
+                this@apply.value = stringView(this, checkNotNull(is24h))
+            }
+        }
     }
 
-internal fun updateDtDate(dt: MutableLiveData<Calendar>, y: Int, m: Int, d: Int) =
+internal fun updateDtDate(dt: MutableLiveData<LocalDateTime>, y: Int, m: Int, d: Int) =
     dt.value?.run {
-        val c = this.clone() as Calendar // force copy
-        c[Calendar.YEAR] = y
-        c[Calendar.MONTH] = m
-        c[Calendar.DAY_OF_MONTH] = d
-        dt.value = c
+        dt.value = withYear(y).withMonth(m).withDayOfMonth(d)
     } ?: check(false)
 
-internal fun updateDtTime(dt: MutableLiveData<Calendar>, h: Int, m: Int, s: Int) =
+internal fun updateDtTime(dt: MutableLiveData<LocalDateTime>, h: Int, m: Int, s: Int) =
     dt.value?.run {
-        val c = this.clone() as Calendar // force copy
-        c[Calendar.HOUR_OF_DAY] = h
-        c[Calendar.MINUTE] = m
-        c[Calendar.SECOND] = s
-        dt.value = c
+        dt.value = withHour(h).withMinute(m).withSecond(s)
     } ?: check(false)

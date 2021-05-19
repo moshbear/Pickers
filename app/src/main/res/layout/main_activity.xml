@@ -14,58 +14,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-        <variable name="vm"
-            type="com.moshy.pickers.MainViewModel" />
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
-
-        <Button
-            android:id="@+id/trigger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_baseline_check_24"
-            android:text="Toggle activation"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/picker"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
-
-        <include
-            android:id="@+id/picker"
-            layout="@layout/datetime_widget"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="@{vm.pickerVisibility}"
-            app:layout_constraintTop_toBottomOf="@+id/trigger"
-            app:layout_constraintBottom_toTopOf="@+id/details"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:label="@{@string/datetime_label}"
-            app:message="@{vm.dtString}" />
-
-        <TextView
-            android:id="@+id/details"
-            style="@style/Widget.MaterialComponents.TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{vm.dtString}"
-            android:visibility="@{vm.detailsVisibility}"
-            app:layout_constraintTop_toBottomOf="@+id/picker"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_activity_layout"
+    android:orientation="vertical">
+    <!-- Buttons added inside MainActivity -->
+</LinearLayout>

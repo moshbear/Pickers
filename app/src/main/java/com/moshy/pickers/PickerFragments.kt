@@ -23,25 +23,36 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
-import java.util.Calendar
 
+@Deprecated(
+    "The use case for this was in conjunction with TimePickerFragment." +
+            "Its use case is deprecated with the standalone DateTimePickerFragment" +
+            " and will be removed in a future commit",
+    ReplaceWith("DateTimePickerFragment")
+)
 class DatePickerFragment(): DialogFragment() {
 
     companion object {
         private const val bkListener = "listener"
-        private const val bkInitDate = "initDate"
+        private const val bkInitDate = "initEpochDate"
 
         @JvmStatic
         internal fun newInstance(
-            initDate: Calendar = Calendar.getInstance(),
+            initDate: LocalDate = LocalDate.now(),
             listener: DatePickerDialog.OnDateSetListener
         ): DatePickerFragment =
             DatePickerFragment().apply {
                 this.arguments = Bundle().apply {
                     putParcelable(bkListener, listener)
-                    putLong(bkInitDate, initDate.timeInMillis)
+                    putLong(bkInitDate, initDate.toEpochDay())
                 }
             }
+        @JvmStatic
+        internal fun newInstance(
+            initDate: LocalDateTime,
+            listener: DatePickerDialog.OnDateSetListener
+        ): DatePickerFragment =
+            newInstance(initDate.toLocalDate(), listener)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -49,54 +60,72 @@ class DatePickerFragment(): DialogFragment() {
 
         val args = checkNotNull(arguments)
         val listener = checkNotNull(args.getParcelable<DatePickerDialog.OnDateSetListener>(bkListener))
-        val initTsMillis = checkNotNull(args.getLong(bkInitDate))
+        val initEpoch = checkNotNull(args.getLong(bkInitDate))
 
-        val c = Calendar.getInstance().apply { this.timeInMillis = initTsMillis }
+        val date = LocalDate.ofEpochDay(initEpoch)
 
         // Create a new instance of DatePickerDialog and return it
         return DatePickerDialog(requireActivity(), listener,
-            c[Calendar.YEAR], c[Calendar.MONTH], c[Calendar.DAY_OF_MONTH])
+            date.year, date.monthValue - 1, date.dayOfMonth)
     }
 }
 
+@Deprecated(
+    "The use case for this was in conjunction with DatePickerFragment." +
+            "Its use case is deprecated with the standalone DateTimePickerFragment" +
+            " and will be removed in a future commit",
+    ReplaceWith("DateTimePickerFragment")
+)
 class TimePickerFragment(
 ): DialogFragment() {
 
     companion object {
         private const val bkListener = "listener"
-        private const val bkInitTime = "initTime"
+        private const val bkInitTime = "initSecondTime"
         private const val bkIs24Hour = "is24Hour"
 
         @JvmStatic
         internal fun newInstance(
-            initTime: Calendar = Calendar.getInstance(),
+            initTime: LocalTime = LocalTime.now(),
             is24Hour: Boolean? = null,
             listener: TimePickerDialog.OnTimeSetListener
         ): TimePickerFragment =
             TimePickerFragment().apply {
                 this.arguments = Bundle().apply {
                     putParcelable(bkListener, listener)
-                    putLong(bkInitTime, initTime.timeInMillis)
+                    putInt(bkInitTime, initTime.toSecondOfDay())
                     if (is24Hour != null)
                         putBoolean(bkIs24Hour, is24Hour)
                 }
             }
-        }
+
+        @JvmStatic
+        internal fun newInstance(
+            initDateTime: LocalDateTime,
+            is24Hour: Boolean? = null,
+            listener: TimePickerDialog.OnTimeSetListener
+        ): TimePickerFragment =
+            newInstance(initDateTime.toLocalTime(), is24Hour, listener)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default values for the picker
 
         val args = checkNotNull(arguments)
         val listener = checkNotNull(args.getParcelable<TimePickerDialog.OnTimeSetListener>(bkListener))
-        val initTsMillis = checkNotNull(args.getLong(bkInitTime))
+        val initSeconds = checkNotNull(args.getInt(bkInitTime))
 
         val is24Hour = (args.get(bkIs24Hour) as Boolean?) ?: DateFormat.is24HourFormat(requireActivity())
 
-        val c = Calendar.getInstance().apply { this.timeInMillis = initTsMillis }
+        // LocalTime.toSecondOfDay() returns an int yet LocalTime.ofSecondOfDay() takes a long.
+        // Odd API quirk.
+        val time = LocalTime.ofSecondOfDay(initSeconds.toLong())
 
         // Create a new instance of TimePickerDialog and return it
         return TimePickerDialog(requireActivity(), listener,
-            c[Calendar.HOUR_OF_DAY], c[Calendar.MINUTE], c[Calendar.SECOND], is24Hour)
+            time.hour, time.minute, time.second, is24Hour)
+
+    }
 
 }
 

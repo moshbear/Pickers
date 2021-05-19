@@ -13,37 +13,42 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.moshy.pickers
+package com.moshy.pickers.ui
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.moshy.pickers.databinding.DatetimeWidgetBinding
-import com.moshy.pickers.databinding.MainActivityBinding
+import com.moshy.pickers.databinding.SecondActivityBinding
+import com.moshy.pickers.R
+import com.moshy.pickers.DateTimePickerFragment
+import java.time.LocalDateTime
 import java.util.Calendar
 
-class MainActivity : AppCompatActivity() {
+class SecondActivity : AppCompatActivity() {
 
-    private lateinit var binding: MainActivityBinding
+    private lateinit var binding: SecondActivityBinding
     private lateinit var viewModel: MainViewModel
 
-    private lateinit var currentDT: Calendar
+    private lateinit var currentDT: LocalDateTime
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val nowSecs = System.currentTimeMillis() / 1000
-        binding = DataBindingUtil.setContentView<MainActivityBinding>(this, R.layout.main_activity)
+        binding = DataBindingUtil.setContentView(this, R.layout.second_activity)
         viewModel =
             ViewModelProvider(this, MainViewModel.Factory(application, nowSecs))
-            .get(MainViewModel::class.java)
+                .get(MainViewModel::class.java)
 
         binding.vm = viewModel
         binding.lifecycleOwner = this
-        binding.trigger.setOnClickListener { viewModel.onClickButton() }
+        binding.trigger.setOnClickListener {
+            DateTimePickerFragment.newInstance(currentDT)
+            { _, c -> viewModel.setDateTimeFromPickerResult(c) }
+            .show(supportFragmentManager, "dt/0")
+        }
 
-        fun updateCurrentDT(dt: Calendar) {
+        fun updateCurrentDT(dt: LocalDateTime) {
             currentDT = dt
         }
 
@@ -51,23 +56,6 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.currentDT.observe(this) {
             updateCurrentDT(it)
-        }
-
-        initPickers(binding.picker)
-    }
-
-    private fun initPickers(pickerWidget: DatetimeWidgetBinding)
-    {
-        pickerWidget.datetimeLayout.visibility = View.GONE
-        pickerWidget.pickDate.setOnClickListener {
-            DatePickerFragment.newInstance(currentDT)
-            { _, y, m, d -> viewModel.setDateFromPickerResult(y, m, d) }
-            .show(supportFragmentManager, "datePicker/0")
-        }
-        pickerWidget.pickTime.setOnClickListener {
-            TimePickerFragment.newInstance(currentDT)
-            { _, h, m, s  -> viewModel.setTimeFromPickerResult(h, m, s) }
-            .show(supportFragmentManager, "timePicker/0")
         }
     }
 }

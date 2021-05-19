@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.moshy.pickers
+package com.moshy.pickers.ui
 
 import android.app.Application
 import android.text.format.DateFormat
@@ -23,12 +23,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import java.time.LocalDateTime
 import java.util.Calendar
+import com.moshy.pickers.R
 
+// TODO: Would `java.time.Instant.ofEpochSecond()` be better for timestamp?
 internal class MainViewModel(
     app: Application,
     initialTimestamp: Long,
-    is24HourView: Boolean
+    initialIs24HourView: Boolean
 ) : ViewModel() {
 
     class Factory(
@@ -41,20 +44,24 @@ internal class MainViewModel(
         }
     }
 
-    private val _currentDT = MutableLiveData<Calendar>()
-    val currentDT: LiveData<Calendar>
+    private val _is24Hour =
+        MutableLiveData<Boolean>().also { it.value = initialIs24HourView }
+    val is24Hour: LiveData<Boolean>
+        get() = _is24Hour
+
+    private val _currentDT =
+        MutableLiveData<LocalDateTime>().also { it.value = timestampToLocalDT(initialTimestamp) }
+    val currentDT: LiveData<LocalDateTime>
         get() = _currentDT
     @Suppress("DEPRECATION")
     private val locale = app.resources.configuration.locale
-    val dtString =
-        dtStringView(currentDT, DateFormatConfiguration(locale, is24HourView),
-            app, R.string.datetime_message)
+    val dtString = dtStringView24(currentDT, is24Hour, locale, app, R.string.datetime_message)
 
     enum class OpState {
         INACTIVE, ACTIVE,
         ;
     }
-    private val state = MutableLiveData<OpState>()
+    private val state = MutableLiveData<OpState>().also { it.value = OpState.INACTIVE }
     val pickerVisibility = Transformations.map(state) {
             when (it) {
                 OpState.ACTIVE -> View.VISIBLE
@@ -68,10 +75,6 @@ internal class MainViewModel(
             }
         }
 
-    init {
-        _currentDT.value = timestampToCalendar(initialTimestamp)
-        state.value = OpState.INACTIVE
-    }
 
     fun onClickButton() {
         when (state.value) {
@@ -81,9 +84,21 @@ internal class MainViewModel(
         }
     }
 
+    fun onToggle24Hour() {
+        when (is24Hour.value) {
+            true -> _is24Hour.value = false
+            false -> _is24Hour.value = true
+            null -> require(false) { "Unexpected null" }
+        }
+    }
+
 
     fun setDateFromPickerResult(y: Int, m: Int, d: Int) = updateDtDate(_currentDT, y, m, d)
 
     fun setTimeFromPickerResult(h: Int, m: Int, s: Int) = updateDtTime(_currentDT, h, m, s)
+
+    fun setDateTimeFromPickerResult(dt: LocalDateTime) {
+        _currentDT.value = dt
+    }
 
 }

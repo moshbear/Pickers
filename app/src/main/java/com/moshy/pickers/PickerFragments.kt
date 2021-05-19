@@ -58,7 +58,7 @@ class DatePickerFragment(): DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker
 
-        val args = checkNotNull(arguments)
+        val args = requireArguments()
         val listener = checkNotNull(args.getParcelable<DatePickerDialog.OnDateSetListener>(bkListener))
         val initEpoch = checkNotNull(args.getLong(bkInitDate))
 
@@ -111,7 +111,7 @@ class TimePickerFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default values for the picker
 
-        val args = checkNotNull(arguments)
+        val args = requireArguments()
         val listener = checkNotNull(args.getParcelable<TimePickerDialog.OnTimeSetListener>(bkListener))
         val initSeconds = checkNotNull(args.getInt(bkInitTime))
 
@@ -156,7 +156,7 @@ class DateTimePickerFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default values for the picker
 
-        val args = checkNotNull(arguments)
+        val args = requireArguments()
         val listener = checkNotNull(args.getParcelable<DateTimePickerDialog.OnDateTimeSetListener>(bkListener))
         val initTsEpochSecs = checkNotNull(args.getLong(bkInitDateTime))
 

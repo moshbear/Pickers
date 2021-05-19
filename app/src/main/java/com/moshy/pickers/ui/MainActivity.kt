@@ -9,8 +9,8 @@ import com.moshy.pickers.R
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        private val navigations = listOf<Pair<String, Class<*>>>(
-            Pair("first", FirstActivity::class.java),
+        private val navigations = listOf<Pair<String, Class<*>?>>(
+            Pair("first (removed)", null),
             Pair("second", SecondActivity::class.java),
             Pair("third", ThirdActivity::class.java)
         )
@@ -23,8 +23,10 @@ class MainActivity : AppCompatActivity() {
                 Button(this@MainActivity).apply {
                     text = nav.first
                     setOnClickListener { _ ->
-                        Intent(this@MainActivity, nav.second).run newActivity@ {
-                            startActivity(this)
+                        nav.second?.apply {
+                            Intent(this@MainActivity, this).run newActivity@{
+                                startActivity(this)
+                            }
                         }
                     }
                     layout.addView(this)

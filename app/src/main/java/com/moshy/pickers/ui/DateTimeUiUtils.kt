@@ -84,13 +84,3 @@ internal fun dtStringView24(dt: LiveData<LocalDateTime>, is24hour: LiveData<Bool
             }
         }
     }
-
-internal fun updateDtDate(dt: MutableLiveData<LocalDateTime>, y: Int, m: Int, d: Int) =
-    dt.value?.run {
-        dt.value = withYear(y).withMonth(m).withDayOfMonth(d)
-    } ?: check(false)
-
-internal fun updateDtTime(dt: MutableLiveData<LocalDateTime>, h: Int, m: Int, s: Int) =
-    dt.value?.run {
-        dt.value = withHour(h).withMinute(m).withSecond(s)
-    } ?: check(false)

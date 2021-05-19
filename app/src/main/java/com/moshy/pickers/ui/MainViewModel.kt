@@ -57,33 +57,6 @@ internal class MainViewModel(
     private val locale = app.resources.configuration.locale
     val dtString = dtStringView24(currentDT, is24Hour, locale, app, R.string.datetime_message)
 
-    enum class OpState {
-        INACTIVE, ACTIVE,
-        ;
-    }
-    private val state = MutableLiveData<OpState>().also { it.value = OpState.INACTIVE }
-    val pickerVisibility = Transformations.map(state) {
-            when (it) {
-                OpState.ACTIVE -> View.VISIBLE
-                else -> View.GONE
-            }
-        }
-    val detailsVisibility = Transformations.map(state) {
-            when (it) {
-                OpState.INACTIVE -> View.VISIBLE
-                else -> View.GONE
-            }
-        }
-
-
-    fun onClickButton() {
-        when (state.value) {
-            OpState.INACTIVE -> state.value = OpState.ACTIVE
-            OpState.ACTIVE -> state.value = OpState.INACTIVE
-            else -> require(false) { "Unexpected state transition" }
-        }
-    }
-
     fun onToggle24Hour() {
         when (is24Hour.value) {
             true -> _is24Hour.value = false
@@ -91,11 +64,6 @@ internal class MainViewModel(
             null -> require(false) { "Unexpected null" }
         }
     }
-
-
-    fun setDateFromPickerResult(y: Int, m: Int, d: Int) = updateDtDate(_currentDT, y, m, d)
-
-    fun setTimeFromPickerResult(h: Int, m: Int, s: Int) = updateDtTime(_currentDT, h, m, s)
 
     fun setDateTimeFromPickerResult(dt: LocalDateTime) {
         _currentDT.value = dt

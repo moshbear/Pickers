@@ -1,5 +1,4 @@
 /*
-* Copyright 2007-2011 The Android Open Source Project
 * Copyright 2021 Andrey V
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +19,10 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.format.DateFormat
 import androidx.fragment.app.DialogFragment
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneOffset
 import java.util.Calendar
 
 class DatePickerFragment(): DialogFragment() {
@@ -95,6 +98,47 @@ class TimePickerFragment(
         return TimePickerDialog(requireActivity(), listener,
             c[Calendar.HOUR_OF_DAY], c[Calendar.MINUTE], c[Calendar.SECOND], is24Hour)
 
+}
+
+class DateTimePickerFragment(
+): DialogFragment() {
+
+    companion object {
+        private const val bkListener = "listener"
+        private const val bkInitDateTime = "initDT"
+        private const val bkIs24Hour = "is24Hour"
+
+        @JvmStatic
+        internal fun newInstance(
+            initDateTime: LocalDateTime = LocalDateTime.now(),
+            is24Hour: Boolean? = null,
+            listener: DateTimePickerDialog.OnDateTimeSetListener
+        ): DateTimePickerFragment =
+            DateTimePickerFragment().apply {
+                this.arguments = Bundle().apply {
+                    putParcelable(bkListener, listener)
+                    putLong(bkInitDateTime, initDateTime.toEpochSecond(ZoneOffset.UTC))
+                    if (is24Hour != null)
+                        putBoolean(bkIs24Hour, is24Hour)
+                }
+            }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // Use the current time as the default values for the picker
+
+        val args = checkNotNull(arguments)
+        val listener = checkNotNull(args.getParcelable<DateTimePickerDialog.OnDateTimeSetListener>(bkListener))
+        val initTsEpochSecs = checkNotNull(args.getLong(bkInitDateTime))
+
+        val is24Hour = (args.get(bkIs24Hour) as Boolean?) ?: DateFormat.is24HourFormat(requireActivity())
+
+        val dt = LocalDateTime.ofEpochSecond(initTsEpochSecs, 0, ZoneOffset.UTC)
+
+        // Create a new instance of DateTimePickerDialog and return it
+        return DateTimePickerDialog(requireActivity(), listener,
+            dt.year, dt.monthValue, dt.dayOfMonth,
+            dt.hour, dt.minute, dt.second, is24Hour)
     }
 
 }

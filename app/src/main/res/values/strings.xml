@@ -21,6 +21,7 @@
     <string name="app_name">Pickers</string>
     <string name="datetime_label">DateTime: </string>
     <string name="datetime_message">%1$s</string>
+    <string name="date_time_picker_dialog_title">Set date and time</string>
     <string name="date_picker_dialog_title">Set date</string>
     <string name="time_picker_dialog_title">Set time</string>
     <string name="date_time_done">Done</string>

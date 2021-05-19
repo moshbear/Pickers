@@ -1,26 +1,20 @@
 # Pickers
 Pickers demo and library for Android.
 
-The purpose here is to be copy-pasteable date and time picker dialogs but also to
+The purpose here is to be copy-pasteable combined date time picker dialogs but also to
 check important parts of the UI state machine used in other projects not ready for release.
 
 This should be buildable in Android Studio with files given.
 
-To use the DialogFragment(s) in your own code:
+To use the DialogFragment in your own code:
 ```kotlin
-fun showDatePickerDialog() {
-	val c = Calendar.getInstance()
-	DatePickerFragment.newInstance(c)
-	{ view, y, m, d -> ... }
-	.show(...)
-}
-fun showTimePickerDialog() {
-	val c = Calendar.getInstance()
-	TimePickerFragment.newInstance(c)
-	{ view, h, m, s -> ... }
+fun showDateTimePickerDialog() {
+	DateTimePickerFragment.newInstance(ldt)
+	{ view, ldt -> ... }
 	.show(...)
 }
 ```
 
-The non-dialog form of one picker followed by another in a Layout has not been tested.
-Doing so would entail orientation-aware layouts, which is on the to-do list.
+The non-dialog picker is also available for use - use a `com.moshy.pickers.DateTimePicker` element
+in the layout xml and set the `onDateTimeChangedListener` callback in a manner similar to the
+dialog example above. 

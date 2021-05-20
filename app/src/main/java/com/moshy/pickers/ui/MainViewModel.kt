@@ -17,14 +17,11 @@ package com.moshy.pickers.ui
 
 import android.app.Application
 import android.text.format.DateFormat
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import java.time.LocalDateTime
-import java.util.Calendar
 import com.moshy.pickers.R
 
 // TODO: Would `java.time.Instant.ofEpochSecond()` be better for timestamp?
@@ -44,26 +41,24 @@ internal class MainViewModel(
         }
     }
 
-    private val _is24Hour =
-        MutableLiveData<Boolean>().also { it.value = initialIs24HourView }
-    val is24Hour: LiveData<Boolean>
-        get() = _is24Hour
-
-    private val _currentDT =
-        MutableLiveData<LocalDateTime>().also { it.value = timestampToLocalDT(initialTimestamp) }
-    val currentDT: LiveData<LocalDateTime>
-        get() = _currentDT
+    // Ideally, this is in the Application and `ldtFormatter` is updated on 24h preference change.
+    // Meaning that `locale` is an implementation detail that's only here for simplicity.
     @Suppress("DEPRECATION")
     private val locale = app.resources.configuration.locale
-    val dtString = dtStringView24(currentDT, is24Hour, locale, app, R.string.datetime_message)
+    private val ldtFormatter = MutableLiveData<DateTimeFormatter>()
+            .also { it.value = DateTimeFormatter(locale, initialIs24HourView) }
 
-    fun onToggle24Hour() {
-        when (is24Hour.value) {
-            true -> _is24Hour.value = false
-            false -> _is24Hour.value = true
-            null -> require(false) { "Unexpected null" }
+    var is24Hour: Boolean = initialIs24HourView
+        set(value) {
+            field = value
+            ldtFormatter.value = DateTimeFormatter(locale, value)
         }
-    }
+
+    private val _currentDT = MutableLiveData<LocalDateTime>()
+            .also { it.value = timestampToLocalDT(initialTimestamp) }
+    val currentDT: LiveData<LocalDateTime>
+        get() = _currentDT
+    val dtString = dtStringView24(currentDT, ldtFormatter, app, R.string.datetime_message)
 
     fun setDateTimeFromPickerResult(dt: LocalDateTime) {
         _currentDT.value = dt

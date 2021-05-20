@@ -21,13 +21,10 @@ class ThirdActivity : AppCompatActivity() {
                 .get(MainViewModel::class.java)
         binding.vm = viewModel
         binding.lifecycleOwner = this
-        viewModel.is24Hour.observe(this) {
-            it?.apply {
-                binding.picker.is24HourView = this
-            }
-        }
+
         binding.trigger.setOnClickListener {
-            viewModel.onToggle24Hour()
+            viewModel.is24Hour = !viewModel.is24Hour
+            binding.picker.is24HourView = viewModel.is24Hour
         }
         binding.picker.setOnDateTimeChangedListener {
                 _, c -> viewModel.setDateTimeFromPickerResult(c)

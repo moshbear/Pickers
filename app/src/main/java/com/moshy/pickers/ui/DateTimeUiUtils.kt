@@ -20,67 +20,37 @@ import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
-internal data class DateFormatConfiguration(val locale: Locale, val is24Hour: Boolean)
-// Singleton to cache SimpleDateFormat for given DateFormatConfiguration
-private val DateFormatSettings = object {
-    private lateinit var dateFormat: DateFormatConfiguration
+internal class DateTimeFormatter(locale: Locale, is24Hour: Boolean) {
+    private val bestDateTimePattern =
+        DateFormat.getBestDateTimePattern(locale,
+        /* skeleton */ when (is24Hour) {
+            true -> "yMd Hms"
+            false -> "yMd hms"
+        })
+    private val formatter = DateTimeFormatter.ofPattern(bestDateTimePattern, locale)
 
-    private lateinit var bestDateTimePattern: String
-
-    private lateinit var formatter: DateTimeFormatter
-
-    fun getSimpleDateFormatter(df: DateFormatConfiguration): DateTimeFormatter {
-        if ((!::dateFormat.isInitialized)
-            || (dateFormat != df))
-        {
-            dateFormat = df
-
-            bestDateTimePattern = DateFormat.getBestDateTimePattern(dateFormat.locale,
-                /* skeleton */ when (dateFormat.is24Hour) {
-                    true -> "y-M-d\nHms"
-                    false -> "y-M-d\nhms"
-                })
-
-            formatter = DateTimeFormatter.ofPattern(bestDateTimePattern, dateFormat.locale)
-        }
-        return formatter
-    }
+    fun formatLocalDateTime(localDateTime: LocalDateTime): String = localDateTime.format(formatter)
 }
 
-internal fun timestampToDateTimeString(df: DateFormatConfiguration, dt: LocalDateTime): String =
-    // the formatter is thread-safe; the caching by the singleton is not
-    synchronized(DateFormatSettings) {
-        dt.format(DateFormatSettings.getSimpleDateFormatter(df))
-    }
-
-internal fun dtStringView24(dt: LiveData<LocalDateTime>, is24hour: LiveData<Boolean>, locale: Locale,
-                          context: Context, @StringRes resId: Int): LiveData<String> =
+internal fun dtStringView24(dt: LiveData<LocalDateTime>, df: LiveData<com.moshy.pickers.ui.DateTimeFormatter>,
+                            context: Context, @StringRes resId: Int): LiveData<String> =
     MediatorLiveData<String>().apply {
-        val stringView = { dt: LocalDateTime, is24: Boolean ->
-            context.getString(resId,
-                timestampToDateTimeString(
-                    DateFormatConfiguration(locale, is24),
-                    dt)
-            )
+        val stringView = { dt: LocalDateTime, df: com.moshy.pickers.ui.DateTimeFormatter ->
+            context.getString(resId, df.formatLocalDateTime(dt))
         }
 
         addSource(dt) { dt: LocalDateTime? ->
-            is24hour.value?.run {
+            df.value?.run {
                 this@apply.value = stringView(checkNotNull(dt), this)
             }
         }
-        addSource(is24hour) { is24h: Boolean? ->
+        addSource(df) { df: com.moshy.pickers.ui.DateTimeFormatter? ->
             dt.value?.run {
-                this@apply.value = stringView(this, checkNotNull(is24h))
+                this@apply.value = stringView(this, checkNotNull(df))
             }
         }
     }
